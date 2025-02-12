@@ -46,8 +46,17 @@ if "conversation" not in st.session_state:
     st.session_state.conversation = []
 
 # Default values
-default_context = "No R.A.G data available. Using default context."
-default_prompt = "Answer the question based on the provided context."
+default_context = """
+This is a default context for the chatbot. You can ask general questions about technology, programming, or AI.
+For example:
+- What is machine learning?
+- How does a neural network work?
+- Explain the concept of natural language processing.
+"""
+default_prompt = """
+You are a helpful assistant. If no specific context is provided, answer general questions based on your training data.
+If the question is unclear or cannot be answered, politely inform the user.
+"""
 
 # Load R.A.G data or use default context
 if os.path.exists("data/crawled_data.json"):
