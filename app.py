@@ -91,6 +91,10 @@ else:
 # Use custom prompt or default prompt
 prompt_to_use = custom_prompt.strip() or default_prompt
 
+# Ensure context and prompt are always used
+context = context or default_context
+prompt_to_use = prompt_to_use or default_prompt
+
 # Create two columns: one for chat and one for feedback
 chat_col, feedback_col = st.columns([3, 1])
 
