@@ -21,8 +21,8 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Judul aplikasi
-st.title("🛸")
-st.markdown("Chatbot with customized R.A.G data")
+st.title("Customizable Chatbot 👾")
+st.markdown("This chatbot uses AI models from Hugging Face and can be customized with R.A.G data.")
 
 # Sidebar for configuration
 st.sidebar.header("Configuration")
@@ -30,7 +30,7 @@ hf_token = st.sidebar.text_input("Enter Hugging Face Token:", type="password", p
 model_options = ["Qwen/Qwen2.5-Coder-32B-Instruct", "Other Model"]
 selected_model = st.sidebar.selectbox("Select AI Model:", model_options)
 
-
+# Input file PDF for R.A.G customization (optional)
 uploaded_file = st.sidebar.file_uploader("Upload a PDF file for R.A.G data (Optional):", type=["pdf"])
 
 if uploaded_file:
@@ -135,17 +135,17 @@ with chat_container:
         if message["role"] == "user":
             col1, col2 = st.columns([1, 10])
             with col1:
-                st.write("🤡")  
+                st.write("👤")  # Avatar pengguna
             with col2:
                 st.markdown(f'<div class="user-bubble">{message["content"]}</div>', unsafe_allow_html=True)
         elif message["role"] == "assistant":
             col1, col2 = st.columns([1, 10])
             with col1:
-                st.write("👽")  
+                st.write("🤖")  # Avatar bot
             with col2:
                 st.markdown(f'<div class="bot-bubble">{message["content"]}</div>', unsafe_allow_html=True)
 
-
+# Delete data after 2 minutes of inactivity
 if "last_activity" not in st.session_state:
     st.session_state.last_activity = time.time()
 
