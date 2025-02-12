@@ -1,24 +1,26 @@
 import streamlit as st
 from utils.hf_inference import generate_response
-from utils.pdf_extractor import extract_text_from_pdf, split_text_into_chunks
-from utils.pdf_extractor import get_relevant_chunks
+from utils.pdf_extractor import extract_text_from_pdf, split_text_into_chunks, get_relevant_chunks
 import json
 import os
 import time
 
+# Load custom CSS
 def local_css(file_name):
     with open(file_name, "r") as f:
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+
 local_css("assets/style.css")
 
+# Load Google Font
 st.markdown("""
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 """, unsafe_allow_html=True)
 
 # Judul aplikasi
-st.set_page_config(page_title="Customizable Chatbot", page_icon="🤖", layout="wide")
+st.set_page_config(page_title="Customizable Chatbot", page_icon="🛸", layout="wide")
 st.title("Customizable Chatbot 👾")
-st.markdown("This chatbot with Customizable R.A.G data.")
+st.markdown("This Chatbot with customized R.A.G data.")
 
 # Sidebar for configuration
 st.sidebar.header("Configuration")
@@ -105,32 +107,30 @@ if user_question:
                 response = generate_response(user_question, context, prompt_to_use, hf_token, selected_model)
 
                 # Add to conversation history
-               # Display conversation history
-chat_container = st.container()
-
-with chat_container:
-    for message in st.session_state.conversation:
-        if message["role"] == "user":
-            col1, col2 = st.columns([1, 10])
-            with col1:
-                st.write("👤")  # Avatar pengguna
-            with col2:
-                st.markdown(f'<div class="user-bubble">{message["content"]}</div>', unsafe_allow_html=True)
-        elif message["role"] == "assistant":
-            col1, col2 = st.columns([1, 10])
-            with col1:
-                st.write("🤖")  # Avatar bot
-            with col2:
-                st.markdown(f'<div class="bot-bubble">{message["content"]}</div>', unsafe_allow_html=True)
+                st.session_state.conversation.append({"role": "user", "content": user_question})
+                st.session_state.conversation.append({"role": "assistant", "content": response})
 
             except Exception as e:
                 st.error(f"An error occurred: {e}")
     else:
         st.warning("Please enter your Hugging Face token in the sidebar.")
+
 # Display conversation history
-for message in st.session_state.conversation:
-    with st.chat_message(message["role"]):
-        st.write(message["content"])
+chat_container = st.container()
+with chat_container:
+    for message in st.session_state.conversation:
+        if message["role"] == "user":
+            col1, col2 = st.columns([1, 10])
+            with col1:
+                st.write("🤡")  
+            with col2:
+                st.markdown(f'<div class="user-bubble">{message["content"]}</div>', unsafe_allow_html=True)
+        elif message["role"] == "assistant":
+            col1, col2 = st.columns([1, 10])
+            with col1:
+                st.write("👽")  
+            with col2:
+                st.markdown(f'<div class="bot-bubble">{message["content"]}</div>', unsafe_allow_html=True)
 
 # Delete data after 2 minutes of inactivity
 if "last_activity" not in st.session_state:
