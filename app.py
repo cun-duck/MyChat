@@ -1,6 +1,6 @@
 import streamlit as st
-from utils.crawl4ai_wrapper import crawl_url
 from utils.hf_inference import generate_response
+from utils.pdf_extractor import extract_text_from_pdf, split_text_into_chunks
 import json
 import os
 import time
@@ -16,24 +16,25 @@ hf_token = st.sidebar.text_input("Enter Hugging Face Token:", type="password", p
 model_options = ["Qwen/Qwen2.5-Coder-32B-Instruct", "Other Model"]
 selected_model = st.sidebar.selectbox("Select AI Model:", model_options)
 
-# Input URL for R.A.G customization
-url = st.sidebar.text_input("Enter URL to Crawl Data (Optional):", placeholder="https://example.com")
+# Input file PDF for R.A.G customization
+uploaded_file = st.sidebar.file_uploader("Upload a PDF file for R.A.G data:", type=["pdf"])
 
-if st.sidebar.button("Crawl Data"):
-    if url:
-        with st.spinner("Crawling data..."):
-            try:
-                # Crawling data using crawl4ai
-                crawled_data = crawl_url(url)
-                # Save data to JSON file
-                os.makedirs("data", exist_ok=True)
-                with open("data/crawled_data.json", "w") as f:
-                    json.dump(crawled_data, f)
-                st.sidebar.success("Data successfully crawled and saved!")
-            except Exception as e:
-                st.sidebar.error(f"Failed to crawl data: {e}")
-    else:
-        st.sidebar.warning("Please enter a URL first.")
+if uploaded_file:
+    with st.spinner("Extracting text from PDF..."):
+        try:
+            # Extract text from the uploaded PDF
+            pdf_text = extract_text_from_pdf(uploaded_file)
+            
+            # Split text into chunks
+            chunks = split_text_into_chunks(pdf_text, chunk_size=500, overlap=100)
+            
+            # Save chunks to JSON file
+            os.makedirs("data", exist_ok=True)
+            with open("data/pdf_data.json", "w") as f:
+                json.dump({"chunks": chunks}, f)
+            st.sidebar.success(f"PDF text successfully extracted and split into {len(chunks)} chunks!")
+        except Exception as e:
+            st.sidebar.error(f"Failed to process PDF: {e}")
 
 # Manual prompt optimization (optional)
 custom_prompt = st.sidebar.text_area(
@@ -59,10 +60,11 @@ If the question is unclear or cannot be answered, politely inform the user.
 """
 
 # Load R.A.G data or use default context
-if os.path.exists("data/crawled_data.json"):
-    with open("data/crawled_data.json", "r") as f:
+if os.path.exists("data/pdf_data.json"):
+    with open("data/pdf_data.json", "r") as f:
         rag_data = json.load(f)
-    context = " ".join(rag_data.get("text", [])) or default_context
+    chunks = rag_data.get("chunks", [])
+    context = " ".join(chunks) if chunks else default_context
 else:
     context = default_context
 
@@ -99,8 +101,8 @@ if "last_activity" not in st.session_state:
     st.session_state.last_activity = time.time()
 
 if time.time() - st.session_state.last_activity > 120:  # 2 minutes
-    if os.path.exists("data/crawled_data.json"):
-        os.remove("data/crawled_data.json")
+    if os.path.exists("data/pdf_data.json"):
+        os.remove("data/pdf_data.json")
     st.session_state.clear()
 else:
     st.session_state.last_activity = time.time()
