@@ -21,8 +21,8 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Judul aplikasi
-st.title("Customizable Chatbot 👾")
-st.markdown("This chatbot uses AI models from Hugging Face and can be customized with R.A.G data.")
+st.title("🛸")
+st.markdown("Chatbot with customized R.A.G data")
 
 # Sidebar for configuration
 st.sidebar.header("Configuration")
