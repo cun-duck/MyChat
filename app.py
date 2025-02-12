@@ -160,25 +160,6 @@ with chat_col:
 
     st.markdown('</div>', unsafe_allow_html=True)  # Akhiri frame chat
 
-    # JavaScript untuk menyesuaikan ukuran frame chat
-    st.markdown("""
-    <script>
-        // Fungsi untuk menyesuaikan tinggi frame chat
-        function adjustChatFrameHeight() {
-            const chatFrame = document.getElementById('chat-frame');
-            const windowHeight = window.innerHeight;
-            const headerHeight = document.querySelector('header').offsetHeight;
-            const footerHeight = document.querySelector('footer') ? document.querySelector('footer').offsetHeight : 0;
-            const chatFrameHeight = windowHeight - headerHeight - footerHeight - 20; // 20px margin
-            chatFrame.style.height = `${chatFrameHeight}px`;
-        }
-
-        // Panggil fungsi saat halaman dimuat dan saat ukuran layar berubah
-        window.addEventListener('resize', adjustChatFrameHeight);
-        window.addEventListener('load', adjustChatFrameHeight);
-    </script>
-    """, unsafe_allow_html=True)
-
 with feedback_col:
     # Feedback section (kolom kecil di kanan)
     st.markdown('<div class="feedback-section">', unsafe_allow_html=True)
