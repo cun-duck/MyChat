@@ -1,6 +1,7 @@
 import streamlit as st
 from utils.hf_inference import generate_response
 from utils.pdf_extractor import extract_text_from_pdf, split_text_into_chunks, get_relevant_chunks
+from utils.model_utils import load_model_options
 import json
 import os
 import time
@@ -21,13 +22,15 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Judul aplikasi
-st.title("🛸")
-st.markdown("Chatbot with customized R.A.G data")
+st.title("Customizable Chatbot 👾")
+st.markdown("This chatbot uses AI models from Hugging Face and can be customized with R.A.G data.")
 
 # Sidebar for configuration
 st.sidebar.header("Configuration")
 hf_token = st.sidebar.text_input("Enter Hugging Face Token:", type="password", placeholder="hf_xxxxxxxxxxxxxxxxxxxxxxxx")
-model_options = ["Qwen/Qwen2.5-Coder-32B-Instruct", "Other Model"]
+
+# Load model options
+model_options = load_model_options()
 selected_model = st.sidebar.selectbox("Select AI Model:", model_options)
 
 # Input file PDF for R.A.G customization (optional)
@@ -88,62 +91,73 @@ else:
 # Use custom prompt or default prompt
 prompt_to_use = custom_prompt.strip() or default_prompt
 
-# Chat interface
-st.subheader("Chat with the Bot")
-user_question = st.chat_input("Ask something to the chatbot:")
+# Create two columns: one for chat and one for feedback
+chat_col, feedback_col = st.columns([3, 1])
 
-if user_question:
-    if hf_token:
-        with st.spinner("Processing response..."):
-            try:
-                # Get relevant chunks based on the question (fallback to default context if no chunks)
-                if chunks:
-                    try:
-                        relevant_chunks = get_relevant_chunks(user_question, chunks, top_n=3)
-                        if relevant_chunks:
-                            st.info("Model is using data from the uploaded PDF.")
-                            st.subheader("Relevant Context from PDF:")
-                            for i, chunk in enumerate(relevant_chunks, 1):
-                                st.markdown(f"**Chunk {i}:** {chunk}")
-                            context = " ".join(relevant_chunks)
-                        else:
-                            st.warning("No relevant data found in the uploaded PDF. Using default context.")
+with chat_col:
+    # Chat interface
+    st.subheader("Chat with the Bot")
+    user_question = st.chat_input("Ask something to the chatbot:")
+
+    if user_question:
+        if hf_token:
+            with st.spinner("Processing response..."):
+                try:
+                    # Get relevant chunks based on the question (fallback to default context if no chunks)
+                    if chunks:
+                        try:
+                            relevant_chunks = get_relevant_chunks(user_question, chunks, top_n=3)
+                            if relevant_chunks:
+                                context = " ".join(relevant_chunks)
+                            else:
+                                context = default_context
+                        except Exception as e:
                             context = default_context
-                    except Exception as e:
-                        st.warning(f"Could not find relevant chunks: {e}")
+                    else:
                         context = default_context
-                else:
-                    st.warning("No PDF uploaded. Using default context.")
-                    context = default_context
 
-                # Generate response using Hugging Face Inference API
-                response = generate_response(user_question, context, prompt_to_use, hf_token, selected_model)
+                    # Generate response using Hugging Face Inference API
+                    response = generate_response(user_question, context, prompt_to_use, hf_token, selected_model)
 
-                # Add to conversation history
-                st.session_state.conversation.append({"role": "user", "content": user_question})
-                st.session_state.conversation.append({"role": "assistant", "content": response})
+                    # Add to conversation history
+                    st.session_state.conversation.append({"role": "user", "content": user_question})
+                    st.session_state.conversation.append({"role": "assistant", "content": response})
 
-            except Exception as e:
-                st.error(f"An error occurred: {e}")
+                except Exception as e:
+                    st.error(f"An error occurred: {e}")
+        else:
+            st.warning("Please enter your Hugging Face token in the sidebar.")
+
+    # Display conversation history
+    chat_container = st.container()
+    with chat_container:
+        for message in st.session_state.conversation:
+            if message["role"] == "user":
+                col1, col2 = st.columns([1, 10])
+                with col1:
+                    st.write("👤")  # Avatar pengguna
+                with col2:
+                    st.markdown(f'<div class="user-bubble">{message["content"]}</div>', unsafe_allow_html=True)
+            elif message["role"] == "assistant":
+                col1, col2 = st.columns([1, 10])
+                with col1:
+                    st.write("🤖")  # Avatar bot
+                with col2:
+                    st.markdown(f'<div class="bot-bubble">{message["content"]}</div>', unsafe_allow_html=True)
+
+with feedback_col:
+    # Feedback section
+    st.subheader("Feedback")
+    if chunks:
+        if relevant_chunks:
+            st.success("Model is using data from the uploaded PDF.")
+            st.markdown("**Relevant Context:**")
+            for i, chunk in enumerate(relevant_chunks, 1):
+                st.markdown(f"**Chunk {i}:** {chunk}")
+        else:
+            st.warning("No relevant data found in the uploaded PDF. Using default context.")
     else:
-        st.warning("Please enter your Hugging Face token in the sidebar.")
-
-# Display conversation history
-chat_container = st.container()
-with chat_container:
-    for message in st.session_state.conversation:
-        if message["role"] == "user":
-            col1, col2 = st.columns([1, 10])
-            with col1:
-                st.write("👤")  # Avatar pengguna
-            with col2:
-                st.markdown(f'<div class="user-bubble">{message["content"]}</div>', unsafe_allow_html=True)
-        elif message["role"] == "assistant":
-            col1, col2 = st.columns([1, 10])
-            with col1:
-                st.write("🤖")  # Avatar bot
-            with col2:
-                st.markdown(f'<div class="bot-bubble">{message["content"]}</div>', unsafe_allow_html=True)
+        st.info("No PDF uploaded. Using default context.")
 
 # Delete data after 2 minutes of inactivity
 if "last_activity" not in st.session_state:
