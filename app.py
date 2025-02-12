@@ -21,7 +21,7 @@ st.markdown("""
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 """, unsafe_allow_html=True)
 
-# Judul aplikasi
+# Judul aplikasi (tetap di bagian atas)
 st.title("Customizable Chatbot 👾")
 st.markdown("This chatbot uses AI models from Hugging Face and can be customized with R.A.G data.")
 
@@ -97,14 +97,15 @@ context = context or default_context
 prompt_to_use = prompt_to_use or default_prompt
 
 # Create two columns: one for chat and one for feedback
-chat_col, feedback_col = st.columns([3, 1])
+chat_col, feedback_col = st.columns([4, 1])
 
 with chat_col:
-    # Placeholder for conversation history
-    chat_container = st.empty()
+    # Placeholder for conversation history (dinamis)
+    chat_container = st.container()
 
     # Display conversation history
-    with chat_container.container():
+    with chat_container:
+        st.markdown('<div class="chat-history">', unsafe_allow_html=True)
         for message in st.session_state.conversation:
             if message["role"] == "user":
                 col1, col2 = st.columns([1, 10])
@@ -118,10 +119,12 @@ with chat_col:
                     st.write("🤖")  # Avatar bot
                 with col2:
                     st.markdown(f'<div class="bot-bubble">{message["content"]}</div>', unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
 
-    # Chat input area below the conversation history
-    st.subheader("Ask the Bot")
+    # Text input area (tetap di bagian bawah)
+    st.markdown('<div class="input-area">', unsafe_allow_html=True)
     user_question = st.chat_input("Ask something to the chatbot:")
+    st.markdown('</div>', unsafe_allow_html=True)
 
     if user_question:
         if hf_token:
@@ -147,21 +150,8 @@ with chat_col:
                     st.session_state.conversation.append({"role": "user", "content": user_question})
                     st.session_state.conversation.append({"role": "assistant", "content": response})
 
-                    # Update the chat container dynamically
-                    with chat_container.container():
-                        for message in st.session_state.conversation:
-                            if message["role"] == "user":
-                                col1, col2 = st.columns([1, 10])
-                                with col1:
-                                    st.write("👤")  # Avatar pengguna
-                                with col2:
-                                    st.markdown(f'<div class="user-bubble">{message["content"]}</div>', unsafe_allow_html=True)
-                            elif message["role"] == "assistant":
-                                col1, col2 = st.columns([1, 10])
-                                with col1:
-                                    st.write("🤖")  # Avatar bot
-                                with col2:
-                                    st.markdown(f'<div class="bot-bubble">{message["content"]}</div>', unsafe_allow_html=True)
+                    # Scroll to bottom after new message
+                    st.experimental_rerun()
 
                 except Exception as e:
                     st.error(f"An error occurred: {e}")
@@ -169,7 +159,8 @@ with chat_col:
             st.warning("Please enter your Hugging Face token in the sidebar.")
 
 with feedback_col:
-    # Feedback section
+    # Feedback section (kolom kecil di kanan)
+    st.markdown('<div class="feedback-section">', unsafe_allow_html=True)
     st.subheader("Feedback")
     if chunks:
         if relevant_chunks:
@@ -181,6 +172,7 @@ with feedback_col:
             st.warning("No relevant data found in the uploaded PDF. Using default context.")
     else:
         st.info("No PDF uploaded. Using default context.")
+    st.markdown('</div>', unsafe_allow_html=True)
 
 # Delete data after 2 minutes of inactivity
 if "last_activity" not in st.session_state:
