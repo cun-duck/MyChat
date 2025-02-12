@@ -105,8 +105,23 @@ if user_question:
                 response = generate_response(user_question, context, prompt_to_use, hf_token, selected_model)
 
                 # Add to conversation history
-                st.session_state.conversation.append({"role": "user", "content": user_question})
-                st.session_state.conversation.append({"role": "assistant", "content": response})
+               # Display conversation history
+chat_container = st.container()
+
+with chat_container:
+    for message in st.session_state.conversation:
+        if message["role"] == "user":
+            col1, col2 = st.columns([1, 10])
+            with col1:
+                st.write("👤")  # Avatar pengguna
+            with col2:
+                st.markdown(f'<div class="user-bubble">{message["content"]}</div>', unsafe_allow_html=True)
+        elif message["role"] == "assistant":
+            col1, col2 = st.columns([1, 10])
+            with col1:
+                st.write("🤖")  # Avatar bot
+            with col2:
+                st.markdown(f'<div class="bot-bubble">{message["content"]}</div>', unsafe_allow_html=True)
 
             except Exception as e:
                 st.error(f"An error occurred: {e}")
