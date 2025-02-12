@@ -68,12 +68,13 @@ if "conversation" not in st.session_state:
 
 # Default values
 default_context = """
-This is a default context for the chatbot. You can ask general questions about technology, programming, or AI.
+This is a general-purpose chatbot that can answer questions about technology, programming, AI, and other topics.
 For example:
 - What is machine learning?
 - How does a neural network work?
 - Explain the concept of natural language processing.
 """
+
 default_prompt = """
 You are a helpful assistant. If no specific context is provided, answer general questions based on your training data.
 If the question is unclear or cannot be answered, politely inform the user.
@@ -119,6 +120,10 @@ with chat_col:
                             context = default_context
                     else:
                         context = default_context
+
+                    # Debugging: Print context and prompt to ensure they are not empty
+                    st.write("Context being used:", context)
+                    st.write("Prompt being used:", prompt_to_use)
 
                     # Generate response using Hugging Face Inference API
                     response = generate_response(user_question, context, prompt_to_use, hf_token, selected_model)
