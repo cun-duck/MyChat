@@ -14,7 +14,17 @@ def generate_response(question, context, prompt, hf_token, model_name):
             "inputs": f"{prompt} {question}\nContext: {context}",
             "parameters": {"max_length": 1500}
         }
+    elif "Qwen" in model_name:
+        # Format input khusus untuk Qwen 2.5 Coder
+        inputs = {
+            "messages": [
+                {"role": "system", "content": prompt},
+                {"role": "user", "content": f"{question}\nContext: {context}"}
+            ],
+            "max_tokens": 1500
+        }
     else:
+        # Default format untuk model lain
         inputs = {
             "prompt": prompt,
             "context": context,
