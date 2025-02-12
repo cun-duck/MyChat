@@ -31,5 +31,8 @@ def generate_response(question, context, prompt, hf_token, model_name):
             "question": question
         }
     
-    response = inference(inputs)
-    return response.get("generated_text", response.get("result", "No response generated."))
+    try:
+        response = inference(inputs)
+        return response.get("generated_text", response.get("result", "I'm sorry, I couldn't generate a response."))
+    except Exception as e:
+        return f"An error occurred: {e}"
