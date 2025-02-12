@@ -100,12 +100,11 @@ prompt_to_use = prompt_to_use or default_prompt
 chat_col, feedback_col = st.columns([3, 1])
 
 with chat_col:
-    # Container for conversation history
-    st.subheader("Conversation History")
-    chat_container = st.container()
+    # Placeholder for conversation history
+    chat_container = st.empty()
 
     # Display conversation history
-    with chat_container:
+    with chat_container.container():
         for message in st.session_state.conversation:
             if message["role"] == "user":
                 col1, col2 = st.columns([1, 10])
@@ -148,8 +147,21 @@ with chat_col:
                     st.session_state.conversation.append({"role": "user", "content": user_question})
                     st.session_state.conversation.append({"role": "assistant", "content": response})
 
-                    # Refresh the page to update the conversation history
-                    st.experimental_rerun()
+                    # Update the chat container dynamically
+                    with chat_container.container():
+                        for message in st.session_state.conversation:
+                            if message["role"] == "user":
+                                col1, col2 = st.columns([1, 10])
+                                with col1:
+                                    st.write("👤")  # Avatar pengguna
+                                with col2:
+                                    st.markdown(f'<div class="user-bubble">{message["content"]}</div>', unsafe_allow_html=True)
+                            elif message["role"] == "assistant":
+                                col1, col2 = st.columns([1, 10])
+                                with col1:
+                                    st.write("🤖")  # Avatar bot
+                                with col2:
+                                    st.markdown(f'<div class="bot-bubble">{message["content"]}</div>', unsafe_allow_html=True)
 
                 except Exception as e:
                     st.error(f"An error occurred: {e}")
