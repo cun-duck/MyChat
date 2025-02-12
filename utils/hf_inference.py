@@ -1,38 +1,30 @@
-from huggingface_hub import InferenceApi
+from huggingface_hub import InferenceClient
 
 def generate_response(question, context, prompt, hf_token, model_name):
-    inference = InferenceApi(repo_id=model_name, token=hf_token)
-    
-    # Format input sesuai kebutuhan model
+    # Initialize the InferenceClient with the appropriate provider
     if "DeepSeek" in model_name:
-        inputs = {
-            "prompt": f"{prompt} {question}\nContext: {context}",
-            "max_tokens": 1500
-        }
+        client = InferenceClient(provider="together", api_key=hf_token)
     elif "Mistral" in model_name:
-        inputs = {
-            "inputs": f"{prompt} {question}\nContext: {context}",
-            "parameters": {"max_length": 1500}
-        }
+        client = InferenceClient(provider="together", api_key=hf_token)
     elif "Qwen" in model_name:
-        # Format input khusus untuk Qwen 2.5 Coder
-        inputs = {
-            "messages": [
-                {"role": "system", "content": prompt},
-                {"role": "user", "content": f"{question}\nContext: {context}"}
-            ],
-            "max_tokens": 1500
-        }
+        client = InferenceClient(provider="sambanova", api_key=hf_token)
     else:
-        # Default format untuk model lain
-        inputs = {
-            "prompt": prompt,
-            "context": context,
-            "question": question
-        }
-    
+        raise ValueError(f"Unsupported model: {model_name}")
+
+    # Prepare messages for chat-based models
+    messages = [
+        {"role": "system", "content": prompt},
+        {"role": "user", "content": f"{question}\nContext: {context}"}
+    ]
+
     try:
-        response = inference(inputs)
-        return response.get("generated_text", response.get("result", "I'm sorry, I couldn't generate a response."))
+        # Generate response using the appropriate model
+        completion = client.chat.completions.create(
+            model=model_name,
+            messages=messages,
+            max_tokens=1500
+        )
+        # Extract and return the generated message
+        return completion.choices[0].message.content
     except Exception as e:
         return f"An error occurred: {e}"
