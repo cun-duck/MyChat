@@ -1,23 +1,4 @@
-/* Gaya umum */
-body {
-    background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
-    font-family: 'Poppins', sans-serif;
-    margin: 0;
-    padding: 0;
-}
-
-/* Gaya untuk chat container */
-.chat-container {
-    background-color: #ffffff;
-    border-radius: 10px;
-    padding: 20px;
-    margin-top: 20px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    max-height: 600px;
-    overflow-y: auto;
-}
-
-/* Gaya untuk bubble teks pengguna */
+/* Styling untuk chat bubbles */
 .user-bubble {
     background-color: #007bff;
     color: white;
@@ -25,60 +6,13 @@ body {
     padding: 10px 15px;
     max-width: 80%;
     margin-bottom: 10px;
-    align-self: flex-end;
-    animation: fadeIn 0.5s ease-in-out;
 }
 
-/* Gaya untuk bubble teks bot */
 .bot-bubble {
-    background-color: #e9ecef;
+    background-color: #f1f1f1;
     color: black;
     border-radius: 15px;
     padding: 10px 15px;
     max-width: 80%;
     margin-bottom: 10px;
-    align-self: flex-start;
-    animation: fadeIn 0.5s ease-in-out;
-}
-
-/* Animasi fade-in */
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-/* Loader kustom */
-.loader {
-    border: 4px solid #f3f3f3;
-    border-top: 4px solid #007bff;
-    border-radius: 50%;
-    width: 30px;
-    height: 30px;
-    animation: spin 1s linear infinite;
-    margin: auto;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-/* Dark mode */
-@media (prefers-color-scheme: dark) {
-    body {
-        background-color: #121212;
-        color: #ffffff;
-    }
-
-    .user-bubble {
-        background-color: #1e88e5;
-    }
-
-    .bot-bubble {
-        background-color: #424242;
-    }
-
-    .chat-container {
-        background-color: #1e1e1e;
-    }
 }
