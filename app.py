@@ -100,6 +100,9 @@ prompt_to_use = prompt_to_use or default_prompt
 chat_col, feedback_col = st.columns([4, 1])
 
 with chat_col:
+    # Frame khusus untuk chat
+    st.markdown('<div class="chat-frame">', unsafe_allow_html=True)
+
     # Placeholder for conversation history (dinamis)
     chat_container = st.container()
 
@@ -150,12 +153,12 @@ with chat_col:
                     st.session_state.conversation.append({"role": "user", "content": user_question})
                     st.session_state.conversation.append({"role": "assistant", "content": response})
 
-                    # No need for experimental_rerun, just let Streamlit rerender naturally
-
                 except Exception as e:
                     st.error(f"An error occurred: {e}")
         else:
             st.warning("Please enter your Hugging Face token in the sidebar.")
+
+    st.markdown('</div>', unsafe_allow_html=True)  # Akhiri frame chat
 
 with feedback_col:
     # Feedback section (kolom kecil di kanan)
