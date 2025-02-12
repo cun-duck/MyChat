@@ -101,14 +101,14 @@ chat_col, feedback_col = st.columns([4, 1])
 
 with chat_col:
     # Frame khusus untuk chat
-    st.markdown('<div class="chat-frame">', unsafe_allow_html=True)
+    st.markdown('<div id="chat-frame" class="chat-frame">', unsafe_allow_html=True)
 
     # Placeholder for conversation history (dinamis)
     chat_container = st.container()
 
     # Display conversation history
     with chat_container:
-        st.markdown('<div class="chat-history">', unsafe_allow_html=True)
+        st.markdown('<div id="chat-history" class="chat-history">', unsafe_allow_html=True)
         for message in st.session_state.conversation:
             if message["role"] == "user":
                 col1, col2 = st.columns([1, 10])
@@ -159,6 +159,25 @@ with chat_col:
             st.warning("Please enter your Hugging Face token in the sidebar.")
 
     st.markdown('</div>', unsafe_allow_html=True)  # Akhiri frame chat
+
+    # JavaScript untuk menyesuaikan ukuran frame chat
+    st.markdown("""
+    <script>
+        // Fungsi untuk menyesuaikan tinggi frame chat
+        function adjustChatFrameHeight() {
+            const chatFrame = document.getElementById('chat-frame');
+            const windowHeight = window.innerHeight;
+            const headerHeight = document.querySelector('header').offsetHeight;
+            const footerHeight = document.querySelector('footer') ? document.querySelector('footer').offsetHeight : 0;
+            const chatFrameHeight = windowHeight - headerHeight - footerHeight - 20; // 20px margin
+            chatFrame.style.height = `${chatFrameHeight}px`;
+        }
+
+        // Panggil fungsi saat halaman dimuat dan saat ukuran layar berubah
+        window.addEventListener('resize', adjustChatFrameHeight);
+        window.addEventListener('load', adjustChatFrameHeight);
+    </script>
+    """, unsafe_allow_html=True)
 
 with feedback_col:
     # Feedback section (kolom kecil di kanan)
