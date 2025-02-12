@@ -1,14 +1,15 @@
 import streamlit as st
 from utils.hf_inference import generate_response
 from utils.pdf_extractor import extract_text_from_pdf, split_text_into_chunks
+from utils.pdf_extractor import get_relevant_chunks
 import json
 import os
 import time
 
 # Judul aplikasi
 st.set_page_config(page_title="Customizable Chatbot", page_icon="🤖", layout="wide")
-st.title("Customizable Chatbot 🤖")
-st.markdown("This chatbot uses AI models from Hugging Face and can be customized with R.A.G data.")
+st.title("Customizable Chatbot 👾")
+st.markdown("This chatbot with Customizable R.A.G data.")
 
 # Sidebar for configuration
 st.sidebar.header("Configuration")
@@ -79,6 +80,18 @@ if user_question:
     if hf_token:
         with st.spinner("Processing response..."):
             try:
+                # Load chunks from JSON
+                if os.path.exists("data/pdf_data.json"):
+                    with open("data/pdf_data.json", "r") as f:
+                        rag_data = json.load(f)
+                    chunks = rag_data.get("chunks", [])
+                else:
+                    chunks = []
+
+                # Get relevant chunks based on the question
+                relevant_chunks = get_relevant_chunks(user_question, chunks, top_n=3)
+                context = " ".join(relevant_chunks) if relevant_chunks else default_context
+
                 # Generate response using Hugging Face Inference API
                 response = generate_response(user_question, context, prompt_to_use, hf_token, selected_model)
 
@@ -90,7 +103,6 @@ if user_question:
                 st.error(f"An error occurred: {e}")
     else:
         st.warning("Please enter your Hugging Face token in the sidebar.")
-
 # Display conversation history
 for message in st.session_state.conversation:
     with st.chat_message(message["role"]):
