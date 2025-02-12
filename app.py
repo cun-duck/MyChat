@@ -5,6 +5,9 @@ import json
 import os
 import time
 
+# Judul aplikasi dan konfigurasi halaman
+st.set_page_config(page_title="Customizable Chatbot", page_icon="🤖", layout="wide")
+
 # Load custom CSS
 def local_css(file_name):
     with open(file_name, "r") as f:
@@ -18,9 +21,8 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Judul aplikasi
-st.set_page_config(page_title="Customizable Chatbot", page_icon="🛸", layout="wide")
-st.title("Customizable Chatbot 👾")
-st.markdown("This Chatbot with customized R.A.G data.")
+st.title("🛸")
+st.markdown("Chatbot with customized R.A.G data.")
 
 # Sidebar for configuration
 st.sidebar.header("Configuration")
@@ -48,13 +50,13 @@ if uploaded_file:
         except Exception as e:
             st.sidebar.error(f"Failed to process PDF: {e}")
 
-# Manual prompt optimization (optional)
+
 custom_prompt = st.sidebar.text_area(
     "Optimize Prompt Manually (Optional):",
     value="Answer the question based on the provided context."
 )
 
-# Initialize session state for conversation history
+
 if "conversation" not in st.session_state:
     st.session_state.conversation = []
 
@@ -71,7 +73,7 @@ You are a helpful assistant. If no specific context is provided, answer general 
 If the question is unclear or cannot be answered, politely inform the user.
 """
 
-# Load R.A.G data or use default context
+
 if os.path.exists("data/pdf_data.json"):
     with open("data/pdf_data.json", "r") as f:
         rag_data = json.load(f)
@@ -80,7 +82,7 @@ if os.path.exists("data/pdf_data.json"):
 else:
     context = default_context
 
-# Use custom prompt or default prompt
+
 prompt_to_use = custom_prompt.strip() or default_prompt
 
 # Chat interface
@@ -103,10 +105,9 @@ if user_question:
                 relevant_chunks = get_relevant_chunks(user_question, chunks, top_n=3)
                 context = " ".join(relevant_chunks) if relevant_chunks else default_context
 
-                # Generate response using Hugging Face Inference API
                 response = generate_response(user_question, context, prompt_to_use, hf_token, selected_model)
 
-                # Add to conversation history
+                
                 st.session_state.conversation.append({"role": "user", "content": user_question})
                 st.session_state.conversation.append({"role": "assistant", "content": response})
 
