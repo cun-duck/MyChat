@@ -6,7 +6,11 @@ import json
 import os
 import time
 
-# Import font Google
+def local_css(file_name):
+    with open(file_name, "r") as f:
+        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+local_css("assets/style.css")
+
 st.markdown("""
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 """, unsafe_allow_html=True)
