@@ -104,28 +104,24 @@ with chat_col:
     st.markdown('<div id="chat-frame" class="chat-frame">', unsafe_allow_html=True)
 
     # Placeholder for conversation history (dinamis)
-    chat_container = st.container()
-
-    # Display conversation history
-    with chat_container:
-        st.markdown('<div id="chat-history" class="chat-history">', unsafe_allow_html=True)
-        for message in st.session_state.conversation:
-            if message["role"] == "user":
-                col1, col2 = st.columns([1, 10])
-                with col1:
-                    st.write("👤")  # Avatar pengguna
-                with col2:
-                    st.markdown(f'<div class="user-bubble">{message["content"]}</div>', unsafe_allow_html=True)
-            elif message["role"] == "assistant":
-                col1, col2 = st.columns([1, 10])
-                with col1:
-                    st.write("🤖")  # Avatar bot
-                with col2:
-                    st.markdown(f'<div class="bot-bubble">{message["content"]}</div>', unsafe_allow_html=True)
-        st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown('<div id="chat-history" class="chat-history">', unsafe_allow_html=True)
+    for message in st.session_state.conversation:
+        if message["role"] == "user":
+            col1, col2 = st.columns([1, 10])
+            with col1:
+                st.write("👤")  # Avatar pengguna
+            with col2:
+                st.markdown(f'<div class="user-bubble">{message["content"]}</div>', unsafe_allow_html=True)
+        elif message["role"] == "assistant":
+            col1, col2 = st.columns([1, 10])
+            with col1:
+                st.write("🤖")  # Avatar bot
+            with col2:
+                st.markdown(f'<div class="bot-bubble">{message["content"]}</div>', unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
 
     # Text input area (tetap di bagian bawah)
-    st.markdown('<div class="input-area">', unsafe_allow_html=True)
+    st.markdown('<div id="input-area" class="input-area">', unsafe_allow_html=True)
     user_question = st.chat_input("Ask something to the chatbot:")
     st.markdown('</div>', unsafe_allow_html=True)
 
@@ -159,6 +155,29 @@ with chat_col:
             st.warning("Please enter your Hugging Face token in the sidebar.")
 
     st.markdown('</div>', unsafe_allow_html=True)  # Akhiri frame chat
+
+    # JavaScript untuk memastikan text input tetap di bawah
+    st.markdown("""
+    <script>
+        // Fungsi untuk memastikan input area tetap di bawah
+        function fixInputPosition() {
+            const inputArea = document.getElementById('input-area');
+            if (inputArea) {
+                inputArea.style.position = 'fixed';
+                inputArea.style.bottom = '0';
+                inputArea.style.width = '75%'; // Sesuaikan dengan lebar kolom chat
+                inputArea.style.backgroundColor = 'white';
+                inputArea.style.padding = '10px';
+                inputArea.style.boxShadow = '0 -2px 5px rgba(0, 0, 0, 0.1)';
+                inputArea.style.zIndex = '1000';
+            }
+        }
+
+        // Panggil fungsi saat halaman dimuat
+        window.addEventListener('load', fixInputPosition);
+        window.addEventListener('resize', fixInputPosition);
+    </script>
+    """, unsafe_allow_html=True)
 
 with feedback_col:
     # Feedback section (kolom kecil di kanan)
