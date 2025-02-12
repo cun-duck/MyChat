@@ -2,7 +2,7 @@
 #chat-frame {
     display: flex;
     flex-direction: column;
-    height: 90vh; /* Tinggi tetap */
+    height: 60vh; /* Tinggi tetap */
     border: 1px solid #ddd;
     border-radius: 10px;
     padding: 10px;
@@ -36,19 +36,9 @@
     margin-bottom: 10px;
 }
 
-/* Styling untuk input area */
-.input-area {
-    position: sticky;
-    bottom: 0;
-    background-color: white;
-    padding: 10px;
-    border-top: 1px solid #ddd;
-    z-index: 1000;
-}
-
 /* Styling untuk feedback section */
 .feedback-section {
-    height: 90vh; /* Tinggi tetap */
+    height: 60vh; /* Tinggi tetap */
     overflow-y: auto; /* Scroll jika konten melebihi tinggi */
     font-size: 0.7em; /* Ukuran teks lebih kecil */
     padding: 10px;
