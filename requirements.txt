@@ -6,3 +6,4 @@ asyncio
 playwright
 pyPDF2
 langchain
+scikit-learn
