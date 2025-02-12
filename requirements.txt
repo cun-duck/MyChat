@@ -3,3 +3,4 @@ streamlit
 huggingface_hub
 crawl4ai
 asyncio
+playwright
