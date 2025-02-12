@@ -150,8 +150,7 @@ with chat_col:
                     st.session_state.conversation.append({"role": "user", "content": user_question})
                     st.session_state.conversation.append({"role": "assistant", "content": response})
 
-                    # Scroll to bottom after new message
-                    st.experimental_rerun()
+                    # No need for experimental_rerun, just let Streamlit rerender naturally
 
                 except Exception as e:
                     st.error(f"An error occurred: {e}")
