@@ -22,7 +22,7 @@ st.markdown("""
 
 # Judul aplikasi
 st.title("🛸")
-st.markdown("Chatbot with customized R.A.G data.")
+st.markdown("Chatbot with customized R.A.G data")
 
 # Sidebar for configuration
 st.sidebar.header("Configuration")
@@ -30,7 +30,7 @@ hf_token = st.sidebar.text_input("Enter Hugging Face Token:", type="password", p
 model_options = ["Qwen/Qwen2.5-Coder-32B-Instruct", "Other Model"]
 selected_model = st.sidebar.selectbox("Select AI Model:", model_options)
 
-# Input file PDF for R.A.G customization (optional)
+
 uploaded_file = st.sidebar.file_uploader("Upload a PDF file for R.A.G data (Optional):", type=["pdf"])
 
 if uploaded_file:
@@ -100,11 +100,20 @@ if user_question:
                 if chunks:
                     try:
                         relevant_chunks = get_relevant_chunks(user_question, chunks, top_n=3)
-                        context = " ".join(relevant_chunks) if relevant_chunks else default_context
+                        if relevant_chunks:
+                            st.info("Model is using data from the uploaded PDF.")
+                            st.subheader("Relevant Context from PDF:")
+                            for i, chunk in enumerate(relevant_chunks, 1):
+                                st.markdown(f"**Chunk {i}:** {chunk}")
+                            context = " ".join(relevant_chunks)
+                        else:
+                            st.warning("No relevant data found in the uploaded PDF. Using default context.")
+                            context = default_context
                     except Exception as e:
                         st.warning(f"Could not find relevant chunks: {e}")
                         context = default_context
                 else:
+                    st.warning("No PDF uploaded. Using default context.")
                     context = default_context
 
                 # Generate response using Hugging Face Inference API
@@ -126,7 +135,7 @@ with chat_container:
         if message["role"] == "user":
             col1, col2 = st.columns([1, 10])
             with col1:
-                st.write("🤡") 
+                st.write("🤡")  
             with col2:
                 st.markdown(f'<div class="user-bubble">{message["content"]}</div>', unsafe_allow_html=True)
         elif message["role"] == "assistant":
@@ -136,7 +145,7 @@ with chat_container:
             with col2:
                 st.markdown(f'<div class="bot-bubble">{message["content"]}</div>', unsafe_allow_html=True)
 
-# Delete data after 2 minutes of inactivity
+
 if "last_activity" not in st.session_state:
     st.session_state.last_activity = time.time()
 
