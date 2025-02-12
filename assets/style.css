@@ -1,20 +1,19 @@
 /* Styling untuk frame chat */
 #chat-frame {
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    padding: 20px;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    height: 90vh; /* Tinggi tetap */
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 10px;
     background-color: #fafafa;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
 }
 
 /* Styling untuk chat history */
 #chat-history {
     flex-grow: 1;
-    overflow-y: auto; 
+    overflow-y: auto; /* Scroll jika konten melebihi tinggi */
     padding-bottom: 10px;
 }
 
@@ -39,15 +38,21 @@
 
 /* Styling untuk input area */
 .input-area {
-    margin-top: 10px;
+    position: sticky;
+    bottom: 0;
+    background-color: white;
+    padding: 10px;
+    border-top: 1px solid #ddd;
+    z-index: 1000;
 }
 
 /* Styling untuk feedback section */
 .feedback-section {
+    height: 90vh; /* Tinggi tetap */
+    overflow-y: auto; /* Scroll jika konten melebihi tinggi */
     font-size: 0.7em; /* Ukuran teks lebih kecil */
     padding: 10px;
     background-color: #f9f9f9;
-    overflow-y: auto;
     border-radius: 10px;
     margin-top: 20px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
