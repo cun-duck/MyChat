@@ -100,9 +100,11 @@ prompt_to_use = prompt_to_use or default_prompt
 chat_col, feedback_col = st.columns([3, 1])
 
 with chat_col:
-    # Display conversation history above the input area
+    # Container for conversation history
     st.subheader("Conversation History")
     chat_container = st.container()
+
+    # Display conversation history
     with chat_container:
         for message in st.session_state.conversation:
             if message["role"] == "user":
