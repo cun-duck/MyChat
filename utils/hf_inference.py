@@ -7,7 +7,7 @@ def generate_response(question, context, prompt, hf_token, model_name):
     elif "Mistral" in model_name:
         client = InferenceClient(provider="together", api_key=hf_token)
     elif "Qwen" in model_name:
-        client = InferenceClient(provider="sambanova", api_key=hf_token)
+        client = InferenceClient(provider="hf-inference", api_key=hf_token)
     else:
         raise ValueError(f"Unsupported model: {model_name}")
 
