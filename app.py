@@ -100,8 +100,26 @@ prompt_to_use = prompt_to_use or default_prompt
 chat_col, feedback_col = st.columns([3, 1])
 
 with chat_col:
-    # Chat interface
-    st.subheader("Chat with the Bot")
+    # Display conversation history above the input area
+    st.subheader("Conversation History")
+    chat_container = st.container()
+    with chat_container:
+        for message in st.session_state.conversation:
+            if message["role"] == "user":
+                col1, col2 = st.columns([1, 10])
+                with col1:
+                    st.write("👤")  # Avatar pengguna
+                with col2:
+                    st.markdown(f'<div class="user-bubble">{message["content"]}</div>', unsafe_allow_html=True)
+            elif message["role"] == "assistant":
+                col1, col2 = st.columns([1, 10])
+                with col1:
+                    st.write("🤖")  # Avatar bot
+                with col2:
+                    st.markdown(f'<div class="bot-bubble">{message["content"]}</div>', unsafe_allow_html=True)
+
+    # Chat input area below the conversation history
+    st.subheader("Ask the Bot")
     user_question = st.chat_input("Ask something to the chatbot:")
 
     if user_question:
@@ -121,10 +139,6 @@ with chat_col:
                     else:
                         context = default_context
 
-                    # Debugging: Print context and prompt to ensure they are not empty
-                    st.write("Context being used:", context)
-                    st.write("Prompt being used:", prompt_to_use)
-
                     # Generate response using Hugging Face Inference API
                     response = generate_response(user_question, context, prompt_to_use, hf_token, selected_model)
 
@@ -132,27 +146,13 @@ with chat_col:
                     st.session_state.conversation.append({"role": "user", "content": user_question})
                     st.session_state.conversation.append({"role": "assistant", "content": response})
 
+                    # Refresh the page to update the conversation history
+                    st.experimental_rerun()
+
                 except Exception as e:
                     st.error(f"An error occurred: {e}")
         else:
             st.warning("Please enter your Hugging Face token in the sidebar.")
-
-    # Display conversation history
-    chat_container = st.container()
-    with chat_container:
-        for message in st.session_state.conversation:
-            if message["role"] == "user":
-                col1, col2 = st.columns([1, 10])
-                with col1:
-                    st.write("👤")  # Avatar pengguna
-                with col2:
-                    st.markdown(f'<div class="user-bubble">{message["content"]}</div>', unsafe_allow_html=True)
-            elif message["role"] == "assistant":
-                col1, col2 = st.columns([1, 10])
-                with col1:
-                    st.write("🤖")  # Avatar bot
-                with col2:
-                    st.markdown(f'<div class="bot-bubble">{message["content"]}</div>', unsafe_allow_html=True)
 
 with feedback_col:
     # Feedback section
