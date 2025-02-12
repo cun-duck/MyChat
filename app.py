@@ -8,74 +8,88 @@ import time
 # Judul aplikasi
 st.set_page_config(page_title="Customizable Chatbot", page_icon="🤖", layout="wide")
 st.title("Customizable Chatbot 🤖")
-st.markdown("Chatbot ini menggunakan model AI dari Hugging Face dan dapat dikostumasi dengan data R.A.G.")
+st.markdown("This chatbot uses AI models from Hugging Face and can be customized with R.A.G data.")
 
-# Sidebar untuk konfigurasi
-st.sidebar.header("Konfigurasi")
-hf_token = st.sidebar.text_input("Masukkan Hugging Face Token:", type="password", placeholder="hf_xxxxxxxxxxxxxxxxxxxxxxxx")
-model_options = ["Qwen/Qwen2.5-Coder-32B-Instruct", "Model Lainnya"]
-selected_model = st.sidebar.selectbox("Pilih Model AI:", model_options)
+# Sidebar for configuration
+st.sidebar.header("Configuration")
+hf_token = st.sidebar.text_input("Enter Hugging Face Token:", type="password", placeholder="hf_xxxxxxxxxxxxxxxxxxxxxxxx")
+model_options = ["Qwen/Qwen2.5-Coder-32B-Instruct", "Other Model"]
+selected_model = st.sidebar.selectbox("Select AI Model:", model_options)
 
-# Input URL untuk kostumasi data R.A.G
-st.subheader("Step 1: Masukkan URL untuk Crawling Data")
-url = st.text_input("Masukkan URL:", placeholder="https://example.com")
+# Input URL for R.A.G customization
+url = st.sidebar.text_input("Enter URL to Crawl Data (Optional):", placeholder="https://example.com")
 
-if st.button("Crawl Data"):
+if st.sidebar.button("Crawl Data"):
     if url:
-        with st.spinner("Mencrawling data..."):
+        with st.spinner("Crawling data..."):
             try:
-                # Crawling data menggunakan crawl4ai
+                # Crawling data using crawl4ai
                 crawled_data = crawl_url(url)
-                # Simpan data ke file JSON
+                # Save data to JSON file
                 os.makedirs("data", exist_ok=True)
                 with open("data/crawled_data.json", "w") as f:
-                    json.dump(craw_data, f)
-                st.success("Data berhasil dicrawl dan disimpan!")
+                    json.dump(crawled_data, f)
+                st.sidebar.success("Data successfully crawled and saved!")
             except Exception as e:
-                st.error(f"Gagal mencrawling data: {e}")
+                st.sidebar.error(f"Failed to crawl data: {e}")
     else:
-        st.warning("Silakan masukkan URL terlebih dahulu.")
+        st.sidebar.warning("Please enter a URL first.")
 
-# Input prompt manual
-st.subheader("Step 2: Optimasi Prompt Manual")
-custom_prompt = st.text_area("Edit prompt manual (opsional):", value="Jawab pertanyaan berdasarkan konteks yang diberikan.")
+# Manual prompt optimization (optional)
+custom_prompt = st.sidebar.text_area(
+    "Optimize Prompt Manually (Optional):",
+    value="Answer the question based on the provided context."
+)
 
-# Interaksi dengan chatbot
-st.subheader("Step 3: Mulai Berinteraksi dengan Chatbot")
-user_question = st.text_input("Tanyakan sesuatu kepada chatbot:")
+# Initialize session state for conversation history
+if "conversation" not in st.session_state:
+    st.session_state.conversation = []
 
-if st.button("Kirim Pertanyaan"):
-    if user_question and hf_token:
-        with st.spinner("Memproses respons..."):
+# Default values
+default_context = "No R.A.G data available. Using default context."
+default_prompt = "Answer the question based on the provided context."
+
+# Load R.A.G data or use default context
+if os.path.exists("data/crawled_data.json"):
+    with open("data/crawled_data.json", "r") as f:
+        rag_data = json.load(f)
+    context = " ".join(rag_data.get("text", [])) or default_context
+else:
+    context = default_context
+
+# Use custom prompt or default prompt
+prompt_to_use = custom_prompt.strip() or default_prompt
+
+# Chat interface
+st.subheader("Chat with the Bot")
+user_question = st.chat_input("Ask something to the chatbot:")
+
+if user_question:
+    if hf_token:
+        with st.spinner("Processing response..."):
             try:
-                # Load data R.A.G
-                if os.path.exists("data/crawled_data.json"):
-                    with open("data/crawled_data.json", "r") as f:
-                        rag_data = json.load(f)
-                    context = " ".join(rag_data.get("text", []))
-                else:
-                    context = "Tidak ada data R.A.G yang tersedia."
+                # Generate response using Hugging Face Inference API
+                response = generate_response(user_question, context, prompt_to_use, hf_token, selected_model)
 
-                # Generate respons menggunakan Hugging Face Inference API
-                response = generate_response(user_question, context, custom_prompt, hf_token, selected_model)
-                
-                # Format output jika mengandung script
-                if "```" in response:
-                    st.markdown("### Output Script:")
-                    st.code(response.split("```")[1], language="python")
-                else:
-                    st.success("Respons chatbot:")
-                    st.write(response)
+                # Add to conversation history
+                st.session_state.conversation.append({"role": "user", "content": user_question})
+                st.session_state.conversation.append({"role": "assistant", "content": response})
+
             except Exception as e:
-                st.error(f"Terjadi kesalahan: {e}")
+                st.error(f"An error occurred: {e}")
     else:
-        st.warning("Silakan masukkan pertanyaan dan token Hugging Face terlebih dahulu.")
+        st.warning("Please enter your Hugging Face token in the sidebar.")
 
-# Hapus data setelah 2 menit tidak aktif
+# Display conversation history
+for message in st.session_state.conversation:
+    with st.chat_message(message["role"]):
+        st.write(message["content"])
+
+# Delete data after 2 minutes of inactivity
 if "last_activity" not in st.session_state:
     st.session_state.last_activity = time.time()
 
-if time.time() - st.session_state.last_activity > 120:  # 2 menit
+if time.time() - st.session_state.last_activity > 120:  # 2 minutes
     if os.path.exists("data/crawled_data.json"):
         os.remove("data/crawled_data.json")
     st.session_state.clear()
