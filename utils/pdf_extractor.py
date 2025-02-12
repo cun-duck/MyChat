@@ -1,3 +1,4 @@
+import PyPDF2
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 
 def extract_text_from_pdf(file):
@@ -5,7 +6,7 @@ def extract_text_from_pdf(file):
     Extracts text from a PDF file.
     Returns the extracted text as a string.
     """
-    reader = PyPDF2.PdfReader(file)
+    reader = PyPDF2.PdfReader(file)  # Gunakan PdfReader dari PyPDF2
     text = ""
     for page in reader.pages:
         text += page.extract_text()
