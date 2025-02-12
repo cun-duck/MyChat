@@ -6,6 +6,11 @@ import json
 import os
 import time
 
+# Import font Google
+st.markdown("""
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+""", unsafe_allow_html=True)
+
 # Judul aplikasi
 st.set_page_config(page_title="Customizable Chatbot", page_icon="🤖", layout="wide")
 st.title("Customizable Chatbot 👾")
