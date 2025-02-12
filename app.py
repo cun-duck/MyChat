@@ -21,8 +21,8 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Judul aplikasi
-st.title("Customizable Chatbot 👾")
-st.markdown("This chatbot uses AI models from Hugging Face and can be customized with R.A.G data.")
+st.title("🛸")
+st.markdown("Chatbot with customized R.A.G data.")
 
 # Sidebar for configuration
 st.sidebar.header("Configuration")
@@ -126,13 +126,13 @@ with chat_container:
         if message["role"] == "user":
             col1, col2 = st.columns([1, 10])
             with col1:
-                st.write("👤")  # Avatar pengguna
+                st.write("🤡") 
             with col2:
                 st.markdown(f'<div class="user-bubble">{message["content"]}</div>', unsafe_allow_html=True)
         elif message["role"] == "assistant":
             col1, col2 = st.columns([1, 10])
             with col1:
-                st.write("🤖")  # Avatar bot
+                st.write("👽")  
             with col2:
                 st.markdown(f'<div class="bot-bubble">{message["content"]}</div>', unsafe_allow_html=True)
 
